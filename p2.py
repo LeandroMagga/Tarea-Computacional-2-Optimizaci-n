@@ -8,7 +8,7 @@ import itertools as it #Paquete con herramientas combinatoriales
 
 N1=[]#lista de nodos
 def nodos1(instancia_17csv):
-    for p in range(17):
+    for p in range(len(instancia_17csv)):
         q=instancia_17csv[p][0]
         N1.insert(p,q)
     return N1
@@ -16,8 +16,8 @@ nodos1(instancia_17csv)
 
 A=[]#lista de arcos
 def arcos(N1):
-    for i in range(17):
-        for j in range(17):
+    for i in range(len(N1)):
+        for j in range(len(N1)):
             f=(N1[i],N1[j])
             A.insert(i,f)
     return A
@@ -34,8 +34,8 @@ coordenadas(N1)
 
 A=[]#lista de arcos
 def arcos(N1):
-    for i in range(17):
-        for j in range(17):
+    for i in range(len(N1)):
+        for j in range(len(N1)):
             f=(N1[i],N1[j])
             A.insert(i,f)
     return A
@@ -43,7 +43,7 @@ arcos(N1)
 
 c={}# diccionario con los largos euclidianos de cada nodo
 def aux(A):
-    for z in range(289):
+    for z in range(len(A)):
         s=A[z]
         n1=A[z][0]
         n2=A[z][1]
