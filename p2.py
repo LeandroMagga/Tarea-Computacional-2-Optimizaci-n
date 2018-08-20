@@ -66,6 +66,9 @@ def subsets(N1):
     return S
 #subsets(N1)
 
+
+
+
 def TSP(N1, c):
 
     mod = Model('TSP')
@@ -89,61 +92,24 @@ def TSP(N1, c):
     mod.__data = x
     return mod
 
-def GenerateInstance(n,kk):
-    K = range(kk)
-    V = ['b']+list(range(n))
-    
-    c0=100
-    x,y={},{}
-    
-    for i in V:
-        x[i] = random.randint(0,100)
-        y[i] = random.randint(0,100)
-    c,t={},{}
-    for i in V:
-        for j in V:
-            c[i,j] = math.sqrt((x[i]-x[j])**2 +(y[i]-y[j])**2)  
-            t[i,j] =random.uniform(0.4,1)*c[i,j]+2
-    
-    a, b = {},{}
-    for i in V:
-        a[i] = random.uniform(0,100)
-        b[i] = 100+a[i]      
-    a['b']=0
-    b['b']=sum(b[i] for i in V)
-    d = {}
-    for i in V:
-        if i == 'b':
-            d['b']=0
-        else:
-            d[i]= random.uniform(10,20)
-    
-    if kk >0:
-        K0 = random.uniform(1.2,1.5)*sum(d[i] for i in V)/kk
-    else:
-        K0 =0
-    return K, V, c0, c, t, a, b, x,y, d, K0
 
 
 
-
-
-
-def TSP_Experiment(n):
+def TSP_Experiment():
 
     N1, c, U
 
-    mod = TSP(V, c)
+    mod = TSP(N1, c)
 
     mod.optimize()
 
     x = mod.__data    
     #Creamos un grafo para dibujar la solución
 
-    E = [(i,j) for i in V for j in V if j!=i and x[i,j].X==1]
+    E = [(i,j) for i in N1 for j in N1 if j!=i and x[i,j].X==1]
     position = {}
-    for i in V:
-        position[i] = (x_pos[i],y_pos[i])
+    for i in N1:
+        position[i] = (U[i][0],U[i][1])
 
     Plt.ion() # interactive mode on
     G = NX.Graph()
@@ -162,3 +128,4 @@ def TSP_Experiment(n):
     Plt.savefig('tsp_'+str(n)+'.png', format="PNG")
 #    Plt.clf()   # Clear figure
     return 'ok'
+
