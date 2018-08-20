@@ -23,6 +23,24 @@ def arcos(N1):
     return A
 arcos(N1)
 
+U={}#coordenadas del nodo i
+def coordenadas(N1):
+    for i in N1:
+            x=instancia_17csv[i][1]
+            y=instancia_17csv[i][2]
+            U[i]=(x,y)
+    return U
+coordenadas(N1)
+
+A=[]#lista de arcos
+def arcos(N1):
+    for i in range(17):
+        for j in range(17):
+            f=(N1[i],N1[j])
+            A.insert(i,f)
+    return A
+arcos(N1)
+
 c={}# diccionario con los largos euclidianos de cada nodo
 def aux(A):
     for z in range(289):
@@ -106,9 +124,14 @@ def GenerateInstance(n,kk):
         K0 =0
     return K, V, c0, c, t, a, b, x,y, d, K0
 
+
+
+
+
+
 def TSP_Experiment(n):
 
-    K, V, c0, c, t, a, b, x_pos,y_pos, d, K0 = GenerateInstance(n,0)
+    N1, c, U
 
     mod = TSP(V, c)
 
