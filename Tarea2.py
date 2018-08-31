@@ -135,98 +135,53 @@ def TSPNF(N, c):
 ###############################################################################
 #                               P3
 ###############################################################################
+def mascerca(c,q,D):
+    j=float('inf')
+    for i in D:
+        if c[q,i]<j:
+            p=i
+    return p
+
+def heur1(N,c,ins,nodo):
+    Nactual=nodo
+    copia=N[:]
+    copia.pop(copia.index(nodo))
+    lista=[nodo]
+    while copia!=[]:
+        nodo=mascerca(c,Nactual,copia)
+        lista.append(nodo)
+        copia.pop(copia.index(nodo))
+        Nactual=nodo
+    c_opti=0
+    B=[]
+    for i in lista:
+        if lista.index(i)!=len(lista)-1:
+            c_opti=c_opti + c[i,lista[lista.index(i)+1]]
+            B.append((i,lista[lista.index(i)+1]))
+        else:
+            c_opti=c_opti + c[i,lista[0]]
+            B.append((i,lista[0]))   
+    f={}
+    for i in N:
+        f[i]=(ins[i][1],ins[i][2])
+    Plt.ion()
+    G=NX.Graph()
+    for i in N:
+        G.add_node(i)
+        G.node[i]['s']=i
     
-def Nodos2(datos):
-    N=[],l1=[],l2=[],l3=[]
-    for lista in datos:
-        l1.append(lista[0])
-        l2.append(lista[1])
-        l3.append(lista[2])
-    N.append(l1)
-    N.append(l2)
-    N.append(l3)
-    return N
-
-#n1=Nodos2(instancia_17csv)
-#n2=Nodos2(instancia_50csv)
-#n3=Nodos2(instancia_150csv)
-#n4=Nodos2(instancia_250csv)
-
-def costos(N):
-    c={}
-    for i in range(len(N[0])):
-        for j in range(len(N[0])):
-            a=N[1][i]-N[1][j]
-            b=N[2][i]-N[2][j]
-            dist=(a**2+b**2)**(0.5)
-            c[i,j]=dist
-    return c
-
-def heur1(N):
-    arcos=[]
-    z=0
-    base=range(len(N[1])) # se toma una base fija que no variara sus elementos nunca y su largo es igual a la cantidad de nodos
-    costo=costos(N) # diccionario de costos de las instancias
-    Nactual=N[0][1]  # se parte desde el segundo nodo en la lista
-    visitados=[]
-    while len(N[0])>1:    
-        N[0].remove(Nactual) # se remueve el nodo en que estoy parado de los posibles nodos a viajar
-        visitados.append(Nactual)  # se agrega el nodo que ya se visito
-        dista=[]
-        arco=[]
-        for i in base: ##cantidad de nodos
-            if i not in visitados:
-                dista.append(costo[Nactual,i]) # aqui ocurre la magia
-                
-        arco.append(Nactual)   
-        menor=min(dista)
-        arco.append(N[0][dista.index(menor)])
-        arcos.append(arco)
-        z=z+menor
-        Nactual=N[0][dista.index(menor)]
-    auxiliar=[]  # no se como unir una lista de 2 elementos en otra lista
-    auxiliar.append(Nactual)   #por eso creo una lista auxiliar que añade 2 nodos
-    auxiliar.append(1)
-    arcos.append(auxiliar)   # y luego esta lista auxiliar se agrega a los arcos
-    z=z+costo[Nactual,1]
-    visitados=visitados+N[0]+[1]
-    return arcos,visitados # el N[0] es el ultimo nodo que aun no se agrega pero si se incluyo el gasto
-# el 1 es porque vuelve al nodo inicial
-    
+    return {'costo optimo':c_opti, 'camino':B,'arcos utilizados':lista}
 ###############################################################################
 #                                   P4
 ###############################################################################
 
-def heur2(N):
-    arcos=[]
-    z=0
-    base=N[1]
-    costo=costos(N)
-    Nactual= arcomin(N)
-    retorno=arcomin(N)
-    visitados=[]
-    while len(N[0])>1:    
-        N[0].remove(Nactual)
-        visitados.append(Nactual)
-        dista=[]
-        arco=[]
-        for i in range(len(base)): ##cantidad de nodos
-            if i not in visitados:
-                dista.append(costo[Nactual,i]) # aqui ocurre la magia
-                
-        arco.append(Nactual)       
-        menor=min(dista)
-        arco.append(N[0][dista.index(menor)])
-        arcos.append(arco)
-        z=z+menor
-        Nactual=N[0][dista.index(menor)]
-    auxiliar=[]
-    auxiliar.append(Nactual)
-    auxiliar.append(retorno)
-    arcos.append(auxiliar)
-    z=z+costo[Nactual,retorno]
-    visitados=visitados+N[0]+[retorno]
-    return arcos,visitados
+
+
+
+
+
+
+
 
 ###############################################################################
 #                                   P5
@@ -320,7 +275,7 @@ def TSPNFR(N, c):
     
 def graficah1(N):
     
-    arcos,nodos=heur2(N)
+    arcos,nodos=heur1(N)
  
     
 
@@ -442,17 +397,87 @@ def compararSE(li):
 #proGSn12= promediar(GAPSEn12)
 #proGSn15= promediar(GAPSEn15)
 
-def graficarp5(x,y,a,b):
+def graficarp5a(x,y,a,b):
     L1=[x,y,a,b]
     Ltama=[6,9,12,15]
-    Plt.subplot(1,2,1)
     Plt.plot(Ltama,L1)
     Plt.title("Graﬁco del GAP promedio en función del tamanño de la instancia.")
     Plt.xlabel("Tamaño Instancia")
     Plt.ylabel("Promedio GAP")
-    Plt.savefig('P5'+"a"+'.png', format="PNG")
     
     return Plt.plot(Ltama,L1)
 
 ###############################  b)   #########################################
+    
+def tiemposolSE(li):
+    time=[]
+    for i in range(len(li)):
+        ins=li[i]
+        N=Nodos(ins)
+        c=costos(ins)
+        mod= TSPSE(N,c)
+        tiempo=mod.Runtime
+        time.append(tiempo)
+    return time
+#timeSE6=tiemposolSE(i1)
+#timeSE9=tiemposolSE(i2)
+#timeSE12=tiemposolSE(i3)
+#timeSE15=tiemposolSE(i4)
+#
+#protimeSEn6= promediar(timeSE6)
+#protimeSEn9= promediar(timeSE9)
+#protimeSEn12= promediar(timeSE12)
+#protimeSEn15= promediar(timeSE15)
 
+def tiemposolNF(li):
+    time=[]
+    for i in range(len(li)):
+        ins=li[i]
+        N=Nodos(ins)
+        c=costos(ins)
+        mod= TSPNF(N,c)
+        tiempo=mod.Runtime
+        time.append(tiempo)
+    return time
+
+#timeNF6=tiemposolNF(i1)
+#timeNF9=tiemposolNF(i2)
+#timeNF12=tiemposolNF(i3)
+#timeNF15=tiemposolNF(i4)
+#
+#protimeNFn6= promediar(timeNF6)
+#protimeNFn9= promediar(timeNF9)
+#protimeNFn12= promediar(timeNF12)
+#protimeNFn15= promediar(timeNF15)
+
+def graficarp5b(x,y,a,b):
+    L1=[x,y,a,b]
+    Ltama=[6,9,12,15]
+    Plt.plot(Ltama,L1)
+    Plt.title("Graﬁco del tiempo promedio en función del tamanño de la instancia.")
+    Plt.xlabel("Tamaño Instancia")
+    Plt.ylabel("Tiempo promedio")
+    
+    return Plt.plot(Ltama,L1)
+
+
+###############################  c ############################################
+    
+def compararh1(li):
+    lc=[]
+    for i in range (0,len(li)):
+        ins=li[i] 
+        N= Nodos(ins)
+        c=costos(ins)
+        mod = TSPSE(N, c)
+        print("")
+        print("Óptimo",mod.ObjVal)
+        print("")    
+        modR= TSPSER(N, c)
+        print("")
+        print("Óptimo relajado",modR.ObjVal)
+        print("")
+        GAP=modR.ObjVal /mod.ObjVal
+        print ("GAP =", GAP)
+        lc.append(GAP)
+    return lc
