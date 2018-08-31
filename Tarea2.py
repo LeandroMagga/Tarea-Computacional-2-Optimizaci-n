@@ -10,8 +10,12 @@ import random
 import networkx as NX
 import matplotlib.pyplot as Plt
 import itertools as it
-
-
+def nodosins(ins):
+    N=[]
+    for i in range(len(ins[0])):
+        N.append(ins[0][i][0])
+    return N
+nodo1ins1=nodosins(i1)
 def Nodos(f):
     N=[]
     for i in range(len(f)):
@@ -39,6 +43,10 @@ def costos(I):
 #c2=costos(instancia_50csv)
 #c3=costos(instancia_150csv)
 #c4=costos(instancia_250csv)
+#c1ins1=costos(i1[0])
+#c2ins2=costos(i2[0])
+#c3ins3=costos(i3[0])
+#c4ins4=costos(i4[0])
 
 def subsets(Nodes):
     ## Return every subset of nodes of size greater than 1 and smaller than n-1.
@@ -50,27 +58,6 @@ def subsets(Nodes):
 
     return U
 
-def mindist(N):
-    costo=costos(N)
-    minimo=10000000
-    for i in costo:
-        if costo[i]!=0:
-            if costo[i]<minimo:
-                minimo=costo[i]
-    
-        
-    return minimo
-
-def arcomin(N):  ## retorna un elemento de la tupla de nodos, donde esta tupla tiene la menor distancia de todas las otras tuplas posibles
-    arcodist=mindist(N)  #se utiliza la funcion mindist 
-    bas=N[1]  # se toma una base fija que no variara sus elementos nunca
-    for i in range(len(bas)):
-        for j in range(len(bas)):
-            a=N[1][i]-N[1][j]
-            b=N[2][i]-N[2][j]
-            largo=(a**2+b**2)**(0.5)
-            if largo==arcodist:
-                return i
 
 ###############################################################################
 #                              P2
@@ -142,7 +129,7 @@ def mascerca(c,q,D):
             p=i
     return p
 
-def heur1(N,c,ins,nodo):
+def heur1(N,c,nodo):
     Nactual=nodo
     copia=N[:]
     copia.pop(copia.index(nodo))
@@ -161,14 +148,7 @@ def heur1(N,c,ins,nodo):
         else:
             c_opti=c_opti + c[i,lista[0]]
             B.append((i,lista[0]))   
-    f={}
-    for i in N:
-        f[i]=(ins[i][1],ins[i][2])
-    Plt.ion()
-    G=NX.Graph()
-    for i in N:
-        G.add_node(i)
-        G.node[i]['s']=i
+    
     
     return {'costo optimo':c_opti, 'camino':B,'arcos utilizados':lista}
 ###############################################################################
@@ -273,32 +253,40 @@ def TSPNFR(N, c):
     return modR
 
     
-def graficah1(N):
-    
-    arcos,nodos=heur1(N)
- 
-    
+def TSP_Experiment(cantidad,tamaño):
 
-    edges = [(i,j) for (i,j) in arcos]
-    nodes=[j for j in nodos]
-    
+    N,c, x_pos,y_pos, d, K0 = crear(cantidad,tamaño)
+
+    mod = heur1(N,c,ins,nodo)
+
+    mod.optimize()
+
+    x = mod.__data    
+    #Creamos un grafo para dibujar la solución
+
+    E = [(i,j) for i in V for j in V if j!=i and x[i,j].X==1]
+    position = {}
+    for i in V:
+        position[i] = (x_pos[i],y_pos[i])
+
     Plt.ion() # interactive mode on
     G = NX.Graph()
     
-    G.add_nodes_from(range(len(N[1])))
+    G.add_nodes_from(V)
     
-    for (i,j) in edges:
+    NX.draw(G, position, node_color="red", node_size=80,nodelist=V)
+    NX.draw(G, position, node_color="blue", node_size=80,nodelist=['b'])
+    Plt.savefig('tsp_instance_'+str(n)+'.png', format="PNG")
+    
+    for (i,j) in E:
         G.add_edge(i,j)
-    position={}
-    for i in range(len(N[1])):
-        position[i] = (N[1][i],N[2][i])
 
-    
-    NX.draw(G, position, node_color="red", node_size=80,nodelist=nodes)
-    Plt.savefig('tsp_'+"esto"+'.png', format="PNG")
-
+    NX.draw(G, position, node_color="red", node_size=80,nodelist=V)
+    NX.draw(G, position, node_color="blue", node_size=80,nodelist=['b'])
+    Plt.savefig('tsp_'+str(n)+'.png', format="PNG")
 #    Plt.clf()   # Clear figure
     return 'ok'
+    
 
 def graficaSE(N):
     mod = TSPSE(N)
@@ -462,8 +450,8 @@ def graficarp5b(x,y,a,b):
 
 
 ###############################  c ############################################
+def compararh1SE(li,nodo):
     
-def compararh1(li):
     lc=[]
     for i in range (0,len(li)):
         ins=li[i] 
@@ -473,11 +461,59 @@ def compararh1(li):
         print("")
         print("Óptimo",mod.ObjVal)
         print("")    
-        modR= TSPSER(N, c)
+        modR= heur1(N,c,nodo)
         print("")
-        print("Óptimo relajado",modR.ObjVal)
+        print("Óptimo heuristica 1",modR['costo optimo'])
         print("")
-        GAP=modR.ObjVal /mod.ObjVal
+        GAP=modR['costo optimo']/mod.Objval
         print ("GAP =", GAP)
         lc.append(GAP)
     return lc
+#GAPSEh1n6=compararh1SE(i1,0)
+#GAPSEh1n9=compararh1SE(i2,0)
+#GAPSEh1n12=compararh1SE(i3,0)
+#GAPSEh1n15=compararh1SE(i4,0)
+    
+#proGAPSEH1n6=promediar(GAPSEh1n6)
+#proGAPSEH1n9=promediar(GAPSEh1n9)
+#proGAPSEH1n12=promediar(GAPSEh1n12)
+#proGAPSEH1n15=promediar(GAPSEh1n15)
+
+def compararh1NF(li,nodo):
+    
+    lc=[]
+    for i in range (0,len(li)):
+        ins=li[i] 
+        N= Nodos(ins)
+        c=costos(ins)
+        mod = TSPNF(N, c)
+        print("")
+        print("Óptimo",mod.ObjVal)
+        print("")    
+        modR= heur1(N,c,nodo)
+        print("")
+        print("Óptimo heuristica 1",modR['costo optimo'])
+        print("")
+        GAP=modR['costo optimo']/mod.Objval
+        print ("GAP =", GAP)
+        lc.append(GAP)
+    return lc
+#GAPNFh1n6=compararh1NF(i1,0)
+#GAPNFh1n9=compararh1NF(i2,0)
+#GAPNFh1n12=compararh1NF(i3,0)
+#GAPNFh1n15=compararh1NF(i4,0)
+#
+#proGAPNFH1n6=promediar(GAPNFh1n6)
+#proGAPNFH1n9=promediar(GAPNFh1n9)
+#proGAPNFH1n12=promediar(GAPNFh1n12)
+#proGAPNFH1n15=promediar(GAPNFh1n15)
+
+def graficarp5c(x,y,a,b):
+    L1=[x,y,a,b]
+    Ltama=[6,9,12,15]
+    Plt.plot(Ltama,L1)
+    Plt.title("Graﬁco del GAP promedio en función del tamanño de la instancia.")
+    Plt.xlabel("Tamaño Instancia")
+    Plt.ylabel("GAP promedio")
+    
+    return Plt.plot(Ltama,L1)
