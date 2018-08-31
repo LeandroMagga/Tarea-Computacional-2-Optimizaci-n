@@ -10,12 +10,19 @@ import random
 import networkx as NX
 import matplotlib.pyplot as Plt
 import itertools as it
+from time import time
+
 def nodosins(ins):
     N=[]
     for i in range(len(ins[0])):
         N.append(ins[0][i][0])
     return N
+
 nodo1ins1=nodosins(i1)
+nodo1ins2=nodosins(i2)
+nodo1ins3=nodosins(i3)
+nodo1ins4=nodosins(i4)
+
 def Nodos(f):
     N=[]
     for i in range(len(f)):
@@ -147,8 +154,7 @@ def heur1(N,c,nodo):
             B.append((i,lista[lista.index(i)+1]))
         else:
             c_opti=c_opti + c[i,lista[0]]
-            B.append((i,lista[0]))   
-    
+            B.append((i,lista[0]))
     
     return {'costo optimo':c_opti, 'camino':B,'arcos utilizados':lista}
 ###############################################################################
@@ -253,67 +259,6 @@ def TSPNFR(N, c):
     return modR
 
     
-def TSP_Experiment(cantidad,tamaño):
-
-    N,c, x_pos,y_pos, d, K0 = crear(cantidad,tamaño)
-
-    mod = heur1(N,c,ins,nodo)
-
-    mod.optimize()
-
-    x = mod.__data    
-    #Creamos un grafo para dibujar la solución
-
-    E = [(i,j) for i in V for j in V if j!=i and x[i,j].X==1]
-    position = {}
-    for i in V:
-        position[i] = (x_pos[i],y_pos[i])
-
-    Plt.ion() # interactive mode on
-    G = NX.Graph()
-    
-    G.add_nodes_from(V)
-    
-    NX.draw(G, position, node_color="red", node_size=80,nodelist=V)
-    NX.draw(G, position, node_color="blue", node_size=80,nodelist=['b'])
-    Plt.savefig('tsp_instance_'+str(n)+'.png', format="PNG")
-    
-    for (i,j) in E:
-        G.add_edge(i,j)
-
-    NX.draw(G, position, node_color="red", node_size=80,nodelist=V)
-    NX.draw(G, position, node_color="blue", node_size=80,nodelist=['b'])
-    Plt.savefig('tsp_'+str(n)+'.png', format="PNG")
-#    Plt.clf()   # Clear figure
-    return 'ok'
-    
-
-def graficaSE(N):
-    mod = TSPSE(N)
-
-    mod.optimize()
-
-    x = mod.__data   
-
-    #Creamos un grafo para dibujar la solución
-
-    E = [(i,j) for i in range(len(N[1])) for j in range(len(N[1])) if j!=i and x[i,j].X==1]
-    position = {}
-    for i in range(len(N[1])):
-        position[i] = (N[1][i],N[2][i])
-
-    Plt.ion() # interactive mode on
-    G = NX.Graph()
-    
-    G.add_nodes_from(range(len(N[1])))
-    
-    for (i,j) in E:
-        G.add_edge(i,j)
-
-    NX.draw(G, position, node_color="red", node_size=80,nodelist=range(len(N[1])))
-    Plt.savefig('tsp_'+"esto"+'.png', format="PNG")
-#    Plt.clf()   # Clear figure
-    return 'ok'
 ####################### a) #########################
     
 def compararNF(li):
@@ -398,15 +343,15 @@ def graficarp5a(x,y,a,b):
 ###############################  b)   #########################################
     
 def tiemposolSE(li):
-    time=[]
+    times=[]
     for i in range(len(li)):
         ins=li[i]
         N=Nodos(ins)
         c=costos(ins)
         mod= TSPSE(N,c)
         tiempo=mod.Runtime
-        time.append(tiempo)
-    return time
+        times.append(tiempo)
+    return times
 #timeSE6=tiemposolSE(i1)
 #timeSE9=tiemposolSE(i2)
 #timeSE12=tiemposolSE(i3)
@@ -418,15 +363,15 @@ def tiemposolSE(li):
 #protimeSEn15= promediar(timeSE15)
 
 def tiemposolNF(li):
-    time=[]
+    times=[]
     for i in range(len(li)):
         ins=li[i]
         N=Nodos(ins)
         c=costos(ins)
         mod= TSPNF(N,c)
         tiempo=mod.Runtime
-        time.append(tiempo)
-    return time
+        times.append(tiempo)
+    return times
 
 #timeNF6=tiemposolNF(i1)
 #timeNF9=tiemposolNF(i2)
@@ -438,6 +383,30 @@ def tiemposolNF(li):
 #protimeNFn12= promediar(timeNF12)
 #protimeNFn15= promediar(timeNF15)
 
+
+def tiemposolh1(li):
+    times=[]
+    for i in range(len(li)):
+        t1=time()
+        ins=li[i]
+        N=Nodos(ins)
+        c=costos(ins)
+        heur1(N,c,0)
+        t2=time()
+        t3=t2-t1
+        times.append(t3)
+    return times
+
+#tiempoh1n6=tiemposolh1(i1)
+#tiempoh1n9=tiemposolh1(i2)
+#tiempoh1n12=tiemposolh1(i3)
+#tiempoh1n15=tiemposolh1(i4)
+#
+#promediotimeh1n6=promediar(tiempoh1n6)
+#promediotimeh1n9=promediar(tiempoh1n9)
+#promediotimeh1n12=promediar(tiempoh1n12)
+#promediotimeh1n15=promediar(tiempoh1n15)
+
 def graficarp5b(x,y,a,b):
     L1=[x,y,a,b]
     Ltama=[6,9,12,15]
@@ -447,7 +416,6 @@ def graficarp5b(x,y,a,b):
     Plt.ylabel("Tiempo promedio")
     
     return Plt.plot(Ltama,L1)
-
 
 ###############################  c ############################################
 def compararh1SE(li,nodo):
@@ -517,3 +485,162 @@ def graficarp5c(x,y,a,b):
     Plt.ylabel("GAP promedio")
     
     return Plt.plot(Ltama,L1)
+
+# falta la cosa de h2
+    
+###############################################################################
+#                                   P6
+###############################################################################
+
+    
+##############################  a #############################################
+
+def TSPSESS(N, c):
+
+    mod = Model('TSPSESS')
+    x = {}
+    for i in N:
+        for j in N:
+            if j!=i:
+                x[i,j] = mod.addVar(vtype = 'B', obj = c[i,j])
+    
+    mod.update()
+    
+    for j in N:
+        mod.addConstr(quicksum(x[i,j] for i in N if j!= i) + quicksum(x[j,i] for i in N if j!= i) == 2 )
+        
+    mod.optimize()
+    x = mod.__data
+    return mod
+
+def graficaSESS(Ne):
+    N=Nodos(Ne)
+    c=costos(Ne)
+    mod = TSPSESS(N, c)
+
+    mod.optimize()
+
+    x = mod.__data    
+    #Creamos un grafo para dibujar la solución
+    E=[]
+    for i in N:
+        for j in N:
+            if i!=j:
+                if x[i,j].X==1:
+                    E.append((i,j))
+    
+    position = {}
+    for i in N:
+        position[i] = (Ne[i][1],Ne[i][2])
+
+    Plt.ion() # interactive mode on
+    G = NX.Graph()
+    for (i,j) in E:
+        G.add_edge(i,j)
+
+    NX.draw(G, position, node_color="red", node_size=150,nodelist=N)
+    node_labels=NX.get_node_attributes(G,'s')
+    NX.draw_networkx_labels(G,position,labels=node_labels)
+    NX.draw(G, position, node_color="blue", node_size=150,nodelist=0)
+    Plt.savefig('TSP_SE_experimento_Sin_ST_'+ str(len(instancia)) +'_10.png', format="PNG")
+
+#    Plt.clf()   # Clear figure
+    return 'ok'
+
+################################ b ############################################
+    
+
+def TSPSESb(N,c):
+ 
+    mod = Model('TSPSESb')  
+    x = {}
+    for i in range(len(N)):
+        for j in range(len(N)):
+            if j!=i:
+                x[i,j] = mod.addVar(vtype = 'B', obj = c[i,j])
+    
+    mod.update()
+    
+    for i in N:
+        mod.addConstr(quicksum(x[i,j] for j in N if j!= i)+quicksum(x[j,i] for j in N if j!= i)==2)
+    mod.addConstr(x[2,5]+x[5,2]+x[2,3]+x[3,2]+x[3,5]+x[5,3]<=2)
+       # mod.addConstr(quicksum(x[i,j] for j in N[0] if j!= i)==quicksum(x[j,i] for j in N[0] if j!= i))
+    
+            
+    mod.__data = x
+
+    return mod
+
+def graficaSESb(N):
+    c=costos(N)
+    mod = TSPSESb(N,c)
+
+    mod.optimize()
+
+    x = mod.__data   
+
+    #Creamos un grafo para dibujar la solución
+
+    E = [(i,j) for i in range(len(N[1])) for j in range(len(N[1])) if j!=i and x[i,j].X==1]
+    position = {}
+    for i in range(len(N[1])):
+        position[i] = (N[1][i],N[2][i])
+
+    Plt.ion() # interactive mode on
+    G = NX.Graph()
+    for i in range(len(N[1])):
+        G.add_node(i)
+        G.node[i]['state']=i
+    
+    for (i,j) in E:
+        G.add_edge(i,j)  
+    NX.draw(G, position, node_color="red", nodelist=range(len(N[1])))
+    node_labels = NX.get_node_attributes(G,'state')
+    NX.draw_networkx_labels(G, position, labels = node_labels)
+    Plt.savefig('tsp_'+"esto"+'.png', format="PNG")
+#    Plt.clf()   # Clear figure
+    return 'ok'
+
+############################## c ##############################################
+
+################################## d ##########################################
+
+def TSP_Experimenth1(insta):
+    
+#    N=nodosins(insta)
+#    c=costos(insta[0])
+    N=Nodos(insta)
+    c=costos(insta)
+    B=heur1(N,c,0)
+    position={}       
+    for i in N:
+#        position[i] = (insta[0][i][1],insta[0][i][2])
+        position[i] = (insta[i][1],insta[i][2])
+    
+    Plt.ion() # interactive mode on
+    G = NX.Graph()    
+    for (i,j) in B['camino']:
+        G.add_edge(i,j)
+    
+    NX.draw(G, position, node_color="red", node_size=150,nodelist=N)
+    node_labels=NX.get_node_attributes(G,'s')
+    NX.draw_networkx_labels(G,position,labels=node_labels)
+    NX.draw(G, position, node_color="blue", node_size=150,nodelist=[0])
+
+#TSP_Experimenth1(instancia_17csv)
+#
+#costoh1=' 861.7775945790911
+#costooptimo=TSPSE(N1,c1)
+
+###############################################################################
+#                                  P7
+###############################################################################
+
+#TSP_Experimenth1(instancia_50csv)
+#TSP_Experimenth1(instancia_150csv)
+#TSP_Experimenth1(instancia_250csv)
+
+#costoh150=' 2904.013187175283
+#costoh1150=' 7770.64305590664
+#costoh1250=' 13163.643121970219
+
