@@ -156,7 +156,7 @@ def heur1(N,c,nodo):
             c_opti=c_opti + c[i,lista[0]]
             B.append((i,lista[0]))
     
-    return {'costo optimo':c_opti, 'camino':B,'arcos utilizados':lista}
+    return {'costo optimo':c_opti, 'camino':lista,'arcos utilizados':B}
 ###############################################################################
 #                                   P4
 ###############################################################################
@@ -508,9 +508,9 @@ def TSPSESS(N, c):
     
     for j in N:
         mod.addConstr(quicksum(x[i,j] for i in N if j!= i) + quicksum(x[j,i] for i in N if j!= i) == 2 )
-        
-    mod.optimize()
-    x = mod.__data
+    
+    
+    mod.__data=x
     return mod
 
 def graficaSESS(Ne):
@@ -541,12 +541,12 @@ def graficaSESS(Ne):
     NX.draw(G, position, node_color="red", node_size=150,nodelist=N)
     node_labels=NX.get_node_attributes(G,'s')
     NX.draw_networkx_labels(G,position,labels=node_labels)
-    NX.draw(G, position, node_color="blue", node_size=150,nodelist=0)
-    Plt.savefig('TSP_SE_experimento_Sin_ST_'+ str(len(instancia)) +'_10.png', format="PNG")
+    NX.draw(G, position, node_color="blue", node_size=150,nodelist=[0])
+    Plt.savefig('TSP_SE_experimento_Sin_ST_'+ str(len(Ne)) +'_10.png', format="PNG")
 
 #    Plt.clf()   # Clear figure
     return 'ok'
-
+#optimo=284.926 858.985 
 ################################ b ############################################
     
 
@@ -563,45 +563,109 @@ def TSPSESb(N,c):
     
     for i in N:
         mod.addConstr(quicksum(x[i,j] for j in N if j!= i)+quicksum(x[j,i] for j in N if j!= i)==2)
-    mod.addConstr(x[2,5]+x[5,2]+x[2,3]+x[3,2]+x[3,5]+x[5,3]<=2)
+    mod.addConstr(x[0,4]+x[4,0]+x[4,6]+x[6,4]+x[0,6]+x[6,0]<=2)
        # mod.addConstr(quicksum(x[i,j] for j in N[0] if j!= i)==quicksum(x[j,i] for j in N[0] if j!= i))
     
             
-    mod.__data = x
+    mod.__data=x
 
     return mod
 
-def graficaSESb(N):
-    c=costos(N)
-    mod = TSPSESb(N,c)
+def graficaSESb(Ne):
+    N=Nodos(Ne)
+    c=costos(Ne)
+    mod = TSPSESb(N, c)
 
     mod.optimize()
 
-    x = mod.__data   
-
+    x = mod.__data    
     #Creamos un grafo para dibujar la solución
-
-    E = [(i,j) for i in range(len(N[1])) for j in range(len(N[1])) if j!=i and x[i,j].X==1]
+    E=[]
+    for i in N:
+        for j in N:
+            if i!=j:
+                if x[i,j].X==1:
+                    E.append((i,j))
+    
     position = {}
-    for i in range(len(N[1])):
-        position[i] = (N[1][i],N[2][i])
+    for i in N:
+        position[i] = (Ne[i][1],Ne[i][2])
 
     Plt.ion() # interactive mode on
     G = NX.Graph()
-    for i in range(len(N[1])):
-        G.add_node(i)
-        G.node[i]['state']=i
-    
     for (i,j) in E:
-        G.add_edge(i,j)  
-    NX.draw(G, position, node_color="red", nodelist=range(len(N[1])))
-    node_labels = NX.get_node_attributes(G,'state')
-    NX.draw_networkx_labels(G, position, labels = node_labels)
-    Plt.savefig('tsp_'+"esto"+'.png', format="PNG")
+        G.add_edge(i,j)
+    for i in N:
+        G.add_node(i)
+        G.node[i]['s']=i
+
+    NX.draw(G, position, node_color="red", node_size=150,nodelist=N)
+    node_labels=NX.get_node_attributes(G,'s')
+    NX.draw_networkx_labels(G,position,labels=node_labels)
+    NX.draw(G, position, node_color="blue", node_size=150,nodelist=[0])
+    Plt.savefig('TSP_SE_experimento_Sin_ST_'+ str(len(Ne)) +'_p6b.png', format="PNG")
+
 #    Plt.clf()   # Clear figure
     return 'ok'
 
 ############################## c ##############################################
+def TSPSESc(N,c):
+ 
+    mod = Model('TSPSESc')  
+    x = {}
+    for i in range(len(N)):
+        for j in range(len(N)):
+            if j!=i:
+                x[i,j] = mod.addVar(vtype = 'B', obj = c[i,j])
+    
+    mod.update()
+    
+    for i in N:
+        mod.addConstr(quicksum(x[i,j] for j in N if j!= i)+quicksum(x[j,i] for j in N if j!= i)==2)
+    mod.addConstr(x[0,4]+x[4,0]+x[4,6]+x[6,4]+x[0,6]+x[6,0] + x[9,12]+x[12,4]+x[2,9]+x[9,2]+x[9,12]+x[12,9]<=5)
+       # mod.addConstr(quicksum(x[i,j] for j in N[0] if j!= i)==quicksum(x[j,i] for j in N[0] if j!= i))
+    
+            
+    mod.__data=x
+
+    return mod
+
+def graficaSESc(Ne):
+    N=Nodos(Ne)
+    c=costos(Ne)
+    mod = TSPSESc(N, c)
+
+    mod.optimize()
+
+    x = mod.__data    
+    #Creamos un grafo para dibujar la solución
+    E=[]
+    for i in N:
+        for j in N:
+            if i!=j:
+                if x[i,j].X==1:
+                    E.append((i,j))
+    
+    position = {}
+    for i in N:
+        position[i] = (Ne[i][1],Ne[i][2])
+
+    Plt.ion() # interactive mode on
+    G = NX.Graph()
+    for (i,j) in E:
+        G.add_edge(i,j)
+    for i in N:
+        G.add_node(i)
+        G.node[i]['s']=i
+
+    NX.draw(G, position, node_color="red", node_size=150,nodelist=N)
+    node_labels=NX.get_node_attributes(G,'s')
+    NX.draw_networkx_labels(G,position,labels=node_labels)
+    NX.draw(G, position, node_color="blue", node_size=150,nodelist=[0])
+    Plt.savefig('TSP_SE_experimento_Sin_ST_'+ str(len(Ne)) +'_p6b.png', format="PNG")
+
+#    Plt.clf()   # Clear figure
+    return 'ok'
 
 ################################## d ##########################################
 
@@ -619,7 +683,7 @@ def TSP_Experimenth1(insta):
     
     Plt.ion() # interactive mode on
     G = NX.Graph()    
-    for (i,j) in B['camino']:
+    for (i,j) in B['arcos utilizados']:
         G.add_edge(i,j)
     
     NX.draw(G, position, node_color="red", node_size=150,nodelist=N)
@@ -630,7 +694,7 @@ def TSP_Experimenth1(insta):
 #TSP_Experimenth1(instancia_17csv)
 #
 #costoh1=' 861.7775945790911
-#costooptimo=TSPSE(N1,c1)
+#costooptimo=349.935
 
 ###############################################################################
 #                                  P7
