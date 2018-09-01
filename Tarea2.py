@@ -546,7 +546,7 @@ def graficaSESS(Ne):
 
 #    Plt.clf()   # Clear figure
     return 'ok'
-#optimo=284.926 858.985 
+#optimo=284.926 
 ################################ b ############################################
     
 
@@ -554,8 +554,8 @@ def TSPSESb(N,c):
  
     mod = Model('TSPSESb')  
     x = {}
-    for i in range(len(N)):
-        for j in range(len(N)):
+    for i in N:
+        for j in N:
             if j!=i:
                 x[i,j] = mod.addVar(vtype = 'B', obj = c[i,j])
     
@@ -613,8 +613,8 @@ def TSPSESc(N,c):
  
     mod = Model('TSPSESc')  
     x = {}
-    for i in range(len(N)):
-        for j in range(len(N)):
+    for i in N:
+        for j in N:
             if j!=i:
                 x[i,j] = mod.addVar(vtype = 'B', obj = c[i,j])
     
@@ -622,10 +622,25 @@ def TSPSESc(N,c):
     
     for i in N:
         mod.addConstr(quicksum(x[i,j] for j in N if j!= i)+quicksum(x[j,i] for j in N if j!= i)==2)
-    mod.addConstr(x[0,4]+x[4,0]+x[4,6]+x[6,4]+x[0,6]+x[6,0] + x[9,12]+x[12,4]+x[2,9]+x[9,2]+x[9,12]+x[12,9]<=5)
-       # mod.addConstr(quicksum(x[i,j] for j in N[0] if j!= i)==quicksum(x[j,i] for j in N[0] if j!= i))
+    mod.addConstr(x[2,9]+x[9,12]+x[9,2]+x[12,9]+x[2,12]+x[12,2]<=2)
+    mod.addConstr(x[0,4]+x[4,0]+x[4,6]+x[6,4]+x[0,6]+x[6,0]<=2)
+    mod.addConstr(x[0,5]+x[5,0]<=1)
+    mod.addConstr(x[0,4]+x[4,0]+x[4,6]+x[6,4]+x[5,6]+x[6,5]+x[5,0]+x[0,5]<=3)
+    mod.addConstr(x[0,4]+x[4,0]+x[4,6]+x[6,4]+x[6,15]+x[15,6]+x[15,5]+x[5,15]+x[5,0]+x[0,5]<=4)
+    mod.addConstr(x[0,4]+x[4,0]<=1)
+    mod.addConstr(x[0,11]+x[11,0]<=1)
+    mod.addConstr(x[12,9]+x[9,12]<=1)
+    mod.addConstr(x[11,14]+x[14,11]+x[16,14]+x[14,16]+x[16,1]+x[1,16]<=3)
+    mod.addConstr(x[15,5]+x[5,15]<=1)
+    mod.addConstr(x[11,14]+x[14,11]+x[16,14]+x[14,16]+x[16,1]+x[1,16]+x[1,11]+x[11,1]<=3)
+    mod.addConstr(x[11,14]+x[14,11]+x[16,11]+x[11,16]+x[16,1]+x[1,16]+x[1,14]+x[14,1]<=3)
+    mod.addConstr(x[12,2]+x[2,12]<=1)
+    mod.addConstr(x[1,14]+x[14,1]+x[16,14]+x[14,16]+x[16,1]+x[1,16]<=2)
+    mod.addConstr(x[1,14]+x[14,1]+x[16,14]+x[14,16]+x[16,11]+x[11,16]+x[1,11]+x[11,1]<=3)
+    mod.addConstr(x[6,4]+x[4,6]<=1)
+    mod.addConstr(x[7,10]+x[10,7]<=1)
+    mod.addConstr(x[1,16]+x[16,1]<=1)
     
-            
     mod.__data=x
 
     return mod
@@ -666,7 +681,12 @@ def graficaSESc(Ne):
 
 #    Plt.clf()   # Clear figure
     return 'ok'
-
+op=[298.424,310.722,311.48,313.229,313.987,314.131,316.181,321.726,327.794,328.678,328.955,332.587,335.907,339.81,345.874,346.597,349.935]
+res=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17]
+Plt.plot(op,res)
+Plt.title("Graﬁco del optimo vs cantidad de restricciones.")
+Plt.xlabel("Cantidad de restricciones")
+Plt.ylabel("optimos")
 ################################## d ##########################################
 
 def TSP_Experimenth1(insta):
